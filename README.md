@@ -62,4 +62,4 @@ If you want to add data sources, refer to the `shared/sources`, and `server/sour
 
 ## License
 
-[MIT](./LICENSE) © ourongxing
+[MIT](./LICENSE) © lukairving
