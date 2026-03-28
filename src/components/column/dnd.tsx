@@ -1,4 +1,4 @@
-import type { PropsWithChildren } from "react"
+import { type PropsWithChildren, useCallback, useEffect } from "react"
 import type { SourceID } from "@shared/types"
 import type { BaseEventPayload, ElementDragType } from "@atlaskit/pragmatic-drag-and-drop/dist/types/internal-types"
 import { extractClosestEdge } from "@atlaskit/pragmatic-drag-and-drop-hitbox/closest-edge"
@@ -11,13 +11,19 @@ import { DndContext } from "../common/dnd"
 import { useSortable } from "../common/dnd/useSortable"
 import type { ItemsProps } from "./card"
 import { CardWrapper } from "./card"
-import { currentSourcesAtom } from "~/atoms"
+import { currentSourcesAtom, failedSourcesAtom } from "~/atoms"
 
 const AnimationDuration = 200
 export function Dnd() {
-  const [items, setItems] = useAtom(currentSourcesAtom)
+  const [items] = useAtom(currentSourcesAtom)
+  const [failedSources, setFailedSources] = useAtom(failedSourcesAtom)
+  const visibleItems = items.filter(id => !failedSources.has(id))
   const [parent] = useAutoAnimate({ duration: AnimationDuration })
   useEntireQuery(items)
+
+  const handleSourceError = useCallback((id: SourceID) => {
+    setFailedSources(prev => new Set([...prev, id]))
+  }, [setFailedSources])
 
   return (
     <DndWrapper items={items} setItems={setItems}>
@@ -42,7 +48,7 @@ export function Dnd() {
           },
         }}
       >
-        {items.map(id => (
+        {visibleItems.map(id => (
           <motion.li
             key={id}
             transition={{
@@ -60,7 +66,7 @@ export function Dnd() {
               },
             }}
           >
-            <SortableCardWrapper id={id} />
+            <SortableCardWrapper id={id} onSourceError={handleSourceError} />
           </motion.li>
         ))}
       </motion.ol>
@@ -139,7 +145,7 @@ function CardOverlay({ id }: { id: SourceID }) {
   )
 }
 
-function SortableCardWrapper({ id }: ItemsProps) {
+function SortableCardWrapper({ id, onSourceError }: ItemsProps) {
   const {
     isDragging,
     setNodeRef,
@@ -160,6 +166,7 @@ function SortableCardWrapper({ id }: ItemsProps) {
         id={id}
         isDragging={isDragging}
         setHandleRef={setHandleRef}
+        onSourceError={onSourceError}
       />
       {OverlayContainer && createPortal(<CardOverlay id={id} />, OverlayContainer)}
     </>
