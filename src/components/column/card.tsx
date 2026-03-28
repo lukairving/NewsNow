@@ -56,8 +56,8 @@ function NewsCard({ id, setHandleRef, onSourceError }: NewsCardProps) {
   const { refresh } = useRefetch()
   const { data, isFetching, isError } = useQuery({
     queryKey: ["source", id],
-    onError: () => {
-      onSourceError?.(id)
+    onSettled: (_data, error) => {
+      if (error) onSourceError?.(id)
     },
     queryFn: async ({ queryKey }) => {
       const id = queryKey[1] as SourceID
