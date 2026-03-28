@@ -37,5 +37,3 @@ export const goToTopAtom = atom({
   el: undefined as HTMLElement | undefined,
   fn: undefined as (() => void) | undefined,
 })
-
-export const failedSourcesAtom = atom(new Set<string>())

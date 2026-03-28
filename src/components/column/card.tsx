@@ -2,7 +2,7 @@ import type { NewsItem, SourceID, SourceResponse } from "@shared/types"
 import { useQuery } from "@tanstack/react-query"
 import { AnimatePresence, motion, useInView } from "framer-motion"
 import { useWindowSize } from "react-use"
-import { forwardRef, useEffect, useImperativeHandle, useRef } from "react"
+import { forwardRef, useImperativeHandle } from "react"
 import { OverlayScrollbar } from "../common/overlay-scrollbar"
 import { safeParseString } from "~/utils"
 
@@ -13,16 +13,14 @@ export interface ItemsProps extends React.HTMLAttributes<HTMLDivElement> {
    */
   isDragging?: boolean
   setHandleRef?: (ref: HTMLElement | null) => void
-  onSourceError?: (id: SourceID) => void
 }
 
 interface NewsCardProps {
   id: SourceID
   setHandleRef?: (ref: HTMLElement | null) => void
-  onSourceError?: (id: SourceID) => void
 }
 
-export const CardWrapper = forwardRef<HTMLElement, ItemsProps>(({ id, isDragging, setHandleRef, onSourceError, style, ...props }, dndRef) => {
+export const CardWrapper = forwardRef<HTMLElement, ItemsProps>(({ id, isDragging, setHandleRef, style, ...props }, dndRef) => {
   const ref = useRef<HTMLDivElement>(null)
 
   const inView = useInView(ref, {
@@ -47,12 +45,12 @@ export const CardWrapper = forwardRef<HTMLElement, ItemsProps>(({ id, isDragging
       }}
       {...props}
     >
-      {inView && <NewsCard id={id} setHandleRef={setHandleRef} onSourceError={onSourceError} />}
+      {inView && <NewsCard id={id} setHandleRef={setHandleRef} />}
     </div>
   )
 })
 
-function NewsCard({ id, setHandleRef, onSourceError }: NewsCardProps) {
+function NewsCard({ id, setHandleRef }: NewsCardProps) {
   const { refresh } = useRefetch()
   const { data, isFetching, isError } = useQuery({
     queryKey: ["source", id],
@@ -103,15 +101,6 @@ function NewsCard({ id, setHandleRef, onSourceError }: NewsCardProps) {
     refetchOnWindowFocus: false,
     retry: false,
   })
-
-  // notify parent when fetch fails so the source can be hidden
-  const prevErrorRef = useRef(false)
-  useEffect(() => {
-    if (isError && !prevErrorRef.current) {
-      onSourceError?.(id)
-    }
-    prevErrorRef.current = isError
-  }, [isError, id, onSourceError])
 
   const { isFocused, toggleFocus } = useFocusWith(id)
 
