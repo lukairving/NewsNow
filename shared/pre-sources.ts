@@ -102,7 +102,8 @@ export const originSources = {
   },
   "hupu": {
     name: "虎扑",
-    disable: true,
+    column: "china",
+    color: "orange",
     home: "https://hupu.com",
   },
   "tieba": {
@@ -285,6 +286,34 @@ export const originSources = {
     color: "blue",
     type: "hottest",
     home: "https://www.baidu.com",
+  },
+  "reddit": {
+    name: "Reddit",
+    type: "hottest",
+    column: "world",
+    color: "orange",
+    home: "https://www.reddit.com/",
+  },
+  "devto": {
+    name: "Dev.to",
+    type: "hottest",
+    column: "tech",
+    color: "gray",
+    home: "https://dev.to/",
+  },
+  "lobsters": {
+    name: "Lobsters",
+    type: "hottest",
+    column: "tech",
+    color: "red",
+    home: "https://lobste.rs/",
+  },
+  "xiaohongshu": {
+    name: "小红书",
+    type: "hottest",
+    column: "china",
+    color: "red",
+    home: "https://www.xiaohongshu.com",
   },
   "linuxdo": {
     name: "LINUX DO",
